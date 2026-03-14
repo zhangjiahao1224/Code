@@ -1,0 +1,43 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+*.exe
+*.o
+*.dll
+*.so
+*.dylib
+build/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+venv/
+env/
+.venv/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# OpenClaw (本地运行，不提交)
+.openclaw/
+config.local.yaml
+
+# Data
+*.hdf5
+*.pkl
+*.npy
+*.mat
