@@ -1,0 +1,36 @@
+# PyTorch 项目 .gitignore
+
+# 数据集（会自动下载）
+data/
+
+# 模型文件（训练后生成，可选择性忽略）
+*.pth
+yolov8n.pt
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.log
+
+# 环境文件
+.env
+venv/
+env/
+
+# Jupyter Notebook 检查点
+.ipynb_checkpoints/
