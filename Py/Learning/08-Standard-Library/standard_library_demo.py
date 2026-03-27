@@ -1,4 +1,4 @@
-# 08-Standard-Library demo: commonly used standard library modules
+# 08-标准库演示：常用标准库模块
 
 import os
 import sys
@@ -17,34 +17,34 @@ import urllib.parse
 
 print("=== Python Standard Library Demo ===\n")
 
-# --- OS Module ---
+# --- OS模块 ---
 print("1. OS Module:")
 print(f"   Current working directory: {os.getcwd()}")
 print(f"   OS name: {os.name}")
 print(f"   Path separator: {os.sep}")
-print(f"   List directory: {os.listdir('.')[:5]}...")  # first 5 items
+print(f"   List directory: {os.listdir('.')[:5]}...")  # 前5个项目
 print()
 
-# --- Sys Module ---
+# --- Sys模块 ---
 print("2. Sys Module:")
 print(f"   Python version: {sys.version}")
 print(f"   Platform: {sys.platform}")
 print(f"   Version info: {sys.version_info}")
 print()
 
-# --- DateTime Module ---
+# --- DateTime模块 ---
 print("3. DateTime Module:")
 now = datetime.datetime.now()
 print(f"   Current date and time: {now}")
 print(f"   Today's date: {datetime.date.today()}")
 print(f"   Time only: {now.time()}")
-# Timedelta example
+# Timedelta示例
 delta = datetime.timedelta(days=7, hours=3)
 future_date = now + delta
 print(f"   One week and 3 hours from now: {future_date}")
 print()
 
-# --- Time Module ---
+# --- Time模块 ---
 print("4. Time Module:")
 timestamp = time.time()
 print(f"   Current timestamp: {timestamp}")
@@ -52,7 +52,7 @@ print(f"   Formatted time: {time.ctime(timestamp)}")
 print(f"   Local time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timestamp))}")
 print()
 
-# --- Random Module ---
+# --- Random模块 ---
 print("5. Random Module:")
 print(f"   Random float between 0 and 1: {random.random():.4f}")
 print(f"   Random integer between 1 and 10: {random.randint(1, 10)}")
@@ -63,7 +63,7 @@ print(f"   Shuffled list: {numbers}")
 print(f"   Random sample of 3: {random.sample(numbers, 3)}")
 print()
 
-# --- Math Module ---
+# --- Math模块 ---
 print("6. Math Module:")
 print(f"   sqrt(144): {math.sqrt(144)}")
 print(f"   factorial(5): {math.factorial(5)}")
@@ -73,7 +73,7 @@ print(f"   pi: {math.pi}")
 print(f"   sin(pi/2): {math.sin(math.pi/2):.4f}")
 print()
 
-# --- Statistics Module ---
+# --- Statistics模块 ---
 print("7. Statistics Module:")
 data = [2.5, 3.7, 2.8, 3.4, 2.1, 3.6, 2.9]
 print(f"   Data: {data}")
@@ -83,7 +83,7 @@ print(f"   Stdev: {statistics.stdev(data):.2f}")
 print(f"   Variance: {statistics.variance(data):.2f}")
 print()
 
-# --- Collections Module ---
+# --- Collections模块 ---
 print("8. Collections Module:")
 # Counter
 words = ['apple', 'banana', 'apple', 'orange', 'banana', 'apple']
@@ -105,7 +105,7 @@ dq.append(4)
 print(f"   Deque: {list(dq)}")
 print()
 
-# --- Itertools Module ---
+# --- Itertools模块 ---
 print("9. Itertools Module:")
 # chain
 list1 = [1, 2, 3]
@@ -124,19 +124,19 @@ product_result = list(itertools.product([1, 2], ['a', 'b']))
 print(f"   product: {product_result}")
 print()
 
-# --- Regular Expressions ---
+# --- 正则表达式 ---
 print("10. Regular Expressions (re):")
 text = "Contact us at support@example.com or sales@company.org"
 email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 emails = re.findall(email_pattern, text)
 print(f"   Text: {text}")
 print(f"   Found emails: {emails}")
-# Substitution
+# 替换
 censored = re.sub(email_pattern, '[EMAIL REDACTED]', text)
 print(f"   After substitution: {censored}")
 print()
 
-# --- JSON Module ---
+# --- JSON模块 ---
 print("11. JSON Module:")
 data = {
     "name": "John Doe",
@@ -154,9 +154,9 @@ parsed = json.loads(json_str)
 print(f"   Parsed name: {parsed['name']}")
 print()
 
-# --- CSV Module ---
+# --- CSV模块 ---
 print("12. CSV Module:")
-# Writing CSV
+# 写入CSV
 with open('sample.csv', 'w', newline='', encoding='utf-8') as f:
     writer = csv.writer(f)
     writer.writerow(['Name', 'Age', 'City'])
@@ -164,22 +164,22 @@ with open('sample.csv', 'w', newline='', encoding='utf-8') as f:
     writer.writerow(['Bob', 30, 'London'])
     writer.writerow(['Charlie', 35, 'Tokyo'])
 
-# Reading CSV
+# 读取CSV
 print("   CSV contents:")
 with open('sample.csv', 'r', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for row in reader:
         print(f"     {row}")
-# Clean up
+# 清理
 import os
 if os.path.exists('sample.csv'):
     os.remove('sample.csv')
 print()
 
-# --- Urllib (basic HTTP request example) ---
+# --- Urllib (基本HTTP请求示例) ---
 print("13. Urllib (HTTP request):")
 try:
-    # Example: fetching a public API (httpbin.org)
+    # 示例：获取公共API (httpbin.org)
     with urllib.request.urlopen('https://httpbin.org/json', timeout=5) as response:
         data = json.loads(response.read().decode())
         print(f"   Successfully fetched JSON data")

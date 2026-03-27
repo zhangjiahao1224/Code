@@ -1,0 +1,19 @@
+name: Build tutorials
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.event_name == 'workflow_dispatch' }}-${{ github.event_name == 'schedule' }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build-tutorials-base.yml
+    secrets: inherit
+    with:
+      USE_NIGHTLY: 0
+      UPLOAD: 1

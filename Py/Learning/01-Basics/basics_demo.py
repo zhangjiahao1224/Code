@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-# 01-Basics 变量、数据类型、运算符、流程控制演示
-# 演示 Python 基础语法：变量赋值、数据类型、运算符、条件语句和循环
-
 # 变量和数据类型
 age = 18                 # 整型 (integer)
 height = 1.75            # 浮点型 (float)
@@ -13,9 +9,41 @@ print("Age:", age)
 print("Height:", height)
 print("Is student:", is_student)
 
+# 输入演示
+print("\n=== 输入演示 ===")
+
+# 基本输入
+user_name = input("请输入您的名字：")
+user_age = int(input("请输入您的年龄："))  # 注意：input() 返回字符串，需要转换类型
+
+print(f"您好，{user_name}！您今年 {user_age} 岁。")
+
+# 使用输入进行计算
+num1 = float(input("请输入第一个数字："))
+num2 = float(input("请输入第二个数字："))
+operation = input("请输入运算符 (+, -, *, /)：")
+
+if operation == "+":
+    result = num1 + num2
+elif operation == "-": 
+    result = num1 - num2
+elif operation == "*":
+    result = num1 * num2
+elif operation == "/":
+    if num2 != 0:
+        result = num1 / num2
+    else:
+        result = "除数不能为零"
+else:
+    result = "无效运算符"
+
+print(f"结果：{result}")
+
 # 算术运算符
 a = 10
 b = 3
+print(a)
+print(b)
 print("a + b =", a + b)   # 加法
 print("a - b =", a - b)   # 减法
 print("a * b =", a * b)   # 乘法
