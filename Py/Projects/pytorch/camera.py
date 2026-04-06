@@ -94,9 +94,13 @@ while True:
         idx = out.argmax().item()  # 获取预测类别索引
         prob = torch.softmax(out, dim=1)[0][idx].item() * 100  # 计算置信度
 
-    # 构建显示标签
-    label = f"{classes[idx]} {prob:.1f}%"  # 例如："汽车 87.5%"
-    color = colors[idx]  # 根据类别选择颜色
+    # ==================== 置信度过滤 ====================
+    if prob < 70:
+        label = f"未知物体 {prob:.1f}%"
+        color = (128, 128, 128)  # 灰色边框
+    else:
+        label = f"{classes[idx]} {prob:.1f}%"
+        color = colors[idx]  # 类别对应颜色
 
     # -------------------------- 绘制识别框 --------------------------
     # 在画面中央绘制一个大框，表示识别区域
@@ -114,7 +118,7 @@ while True:
     frame = cv2.cvtColor(np.array(frame_pil), cv2.COLOR_RGB2BGR)
 
     # ==================== 显示结果 ====================
-    cv2.imshow("AI实时识别", frame)
+    cv2.imshow("AI Recognition", frame)
 
     # ==================== 退出条件 ====================
     # 按 'q' 键退出循环

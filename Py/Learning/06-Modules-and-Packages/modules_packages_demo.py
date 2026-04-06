@@ -45,7 +45,7 @@ class Calculator:
 
 # 现在导入并使用模块
 # LSP可能无法识别动态创建的文件，但在运行时有效
-import utils
+import Py.Utils.utils as utils
 print("Using custom module:")
 print("utils.add(5, 3):", utils.add(5, 3))
 print("utils.multiply(4, 6):", utils.multiply(4, 6))

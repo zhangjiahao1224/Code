@@ -380,7 +380,7 @@ def get_transform(train):
 #
 # Before iterating over the dataset, it's good to see what the model
 # expects during training and inference time on sample data.
-import utils
+import Py.Utils.utils as utils
 
 model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights="DEFAULT")
 dataset = PennFudanDataset('data/PennFudanPed', get_transform(train=True))

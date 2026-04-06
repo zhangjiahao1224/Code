@@ -34,5 +34,5 @@ z = x + y
 print(z)
 
 # ====================== 5. 回到CPU ======================
-z = z.cpu()
+z = z.cpu() # 移回CPU
 print("回到CPU:", z.device)
