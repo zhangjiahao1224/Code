@@ -1,79 +1,93 @@
-机器人相关代码仓库
+# 机器人与 AI 代码仓库
 
-## 目录结构
+这个仓库用于整理机器人、深度学习、视觉、数据分析以及通用编程练习代码。内容既包括学习阶段的示例与笔记，也包括课程实践、小型项目和历史实验归档。
 
+## 仓库定位
+
+- 按语言组织：`C++`、`Py`、`Matlab`
+- 按用途拆分：学习示例、项目实践、工具库、数据与产物
+- 适合用来持续积累机器人与 AI 方向的代码资产
+
+## 目录导航
+
+### 顶层目录
+
+| 目录 | 说明 |
+| --- | --- |
+| `C++/` | C++ 相关代码，包含 ROS、算法、工具库与学习示例 |
+| `Py/` | Python 相关代码，包含项目、深度学习练习、脚本、数据分析与刷题 |
+| `Matlab/` | Matlab 相关代码，主要用于机器人仿真与数据分析 |
+| `Common/` | 跨语言共享资源，如配置、数据集与文档 |
+| `data/` | 当前使用中的数据资源 |
+| `artifacts/` | 训练结果、中间产物或导出文件 |
+| `Archive/` | 历史实验、旧项目与归档代码 |
+| `zip/` | 压缩包、安装包等离线资源 |
+
+### 重点入口
+
+#### Python
+
+- [`Py/Projects/DeepLearning/`](./Py/Projects/DeepLearning/)：深度学习课程实践，涵盖 `MLP`、`RNN`、`Self-Attention` 与 `Transformer`
+- [`Py/Projects/DeepLearning/README.md`](./Py/Projects/DeepLearning/README.md)：深度学习课程实践说明
+- [`Py/Projects/MachineLearning/`](./Py/Projects/MachineLearning/)：机器学习相关实验
+- [`Py/Projects/pytorch/`](./Py/Projects/pytorch/)：PyTorch 练习与数据集实验
+- [`Py/Learning/`](./Py/Learning/)：Python 基础与进阶学习代码
+- [`Py/LeetCode/`](./Py/LeetCode/)：算法刷题记录
+- [`Py/LeRobot/`](./Py/LeRobot/)：LeRobot 相关数据、训练与部署流程
+
+#### C++
+
+- [`C++/ROS/`](./C++/ROS/)：ROS 节点、实时控制与机器人相关程序
+- [`C++/Algorithm/`](./C++/Algorithm/)：路径规划、SLAM、控制算法实现
+- [`C++/Libs/`](./C++/Libs/)：自封装 C++ 工具库
+- [`C++/Learning/`](./C++/Learning/)：C++ 基础、STL、内存管理与现代 C++ 练习
+
+#### Matlab
+
+- [`Matlab/Robotics/`](./Matlab/Robotics/)：机器人仿真与控制算法验证
+- [`Matlab/DataAnalysis/`](./Matlab/DataAnalysis/)：数据分析与可视化脚本
+
+## 简化结构示意
+
+```text
+.
+├── C++/
+│   ├── ROS/
+│   ├── Algorithm/
+│   ├── Libs/
+│   ├── Projects/
+│   └── Learning/
+├── Py/
+│   ├── Learning/
+│   ├── Projects/
+│   ├── LeRobot/
+│   ├── DataAnalysis/
+│   ├── Scripts/
+│   ├── ROS/
+│   ├── Utils/
+│   └── LeetCode/
+├── Matlab/
+│   ├── Robotics/
+│   └── DataAnalysis/
+├── Common/
+│   ├── Configs/
+│   ├── Datasets/
+│   └── Docs/
+├── data/
+├── artifacts/
+├── Archive/
+└── zip/
 ```
-├── C++/                  # C++ 相关代码
-│   ├── ROS/              # ROS 节点、实时控制、运动学解算
-│   ├── Algorithm/        # 路径规划、SLAM、控制算法实现
-│   ├── Libs/             # 自己封装的C++工具库
-│   ├── Projects/         # 完整C++项目
-│   ├── Learning/         # C++学习路径
-│   │   ├── 01-Basics/            # 变量、数据类型、运算符、流程控制
-│   │   │   └── basics_demo.cpp
-│   │   ├── 02-Functions/         # 函数定义、参数、返回值、重载
-│   │   │   └── functions_demo.cpp
-│   │   ├── 03-Arrays-and-Pointers/ # 数组、指针、引用
-│   │   │   └── arrays_pointers_demo.cpp
-│   │   ├── 04-OOP/               # 类、封装、继承、多态
-│   │   │   └── oop_demo.cpp
-│   │   ├── 05-STL/               # 标准库：容器、算法、迭代器
-│   │   │   └── stl_demo.cpp
-│   │   ├── 06-Memory-Management/ # new/delete、RAII、智能指针
-│   │   │   └── memory_demo.cpp
-│   │   └── 07-Advanced-Topics/   # 模板、异常、多线程、现代 C++ 特性
-│   │       └── advanced_demo.cpp
-│   ├── test.cpp          # 测试代码
-│   └── test.exe          # 编译产物
-│
-├── Py/                   # Python 相关代码
-│   ├── LeRobot/          # LeRobot 全流程
-│   │   ├── data/          # 采集的 episode 数据
-│   │   ├── train/         # 训练脚本
-│   │   └── deploy/        # 推理部署
-│   ├── ROS/              # Python ROS节点
-│   ├── DataAnalysis/     # 数据分析、可视化
-│   ├── Scripts/          # 自动化脚本
-│   ├── Libs/             # 自己封装的Python库
-│   ├── Utils/            # 常用工具函数
-│   ├── Projects/         # Python 项目
-│   ├── Learning/         # Python学习路径
-│   │   ├── 01-Basics/           # 变量、数据类型、运算符、流程控制
-│   │   │   └── basics_demo.py
-│   │   ├── 02-Functions/        # 函数定义、参数、返回值、递归、lambda
-│   │   │   └── functions_demo.py
-│   │   ├── 03-Data-Structures/  # 列表、元组、字典、集合、字符串
-│   │   │   └── data_structures_demo.py
-│   │   ├── 04-OOP/              # 类、封装、继承、多态、特殊方法
-│   │   │   └── oop_demo.py
-│   │   ├── 05-File-Handling/    # 文件读写、CSV处理、JSON处理、路径操作
-│   │   │   └── file_handling_demo.py
-│   │   ├── 06-Modules-and-Packages/  # 模块导入、包结构、标准库、虚拟环境
-│   │   │   └── modules_packages_demo.py
-│   │   ├── 07-Exception-Handling/    # 异常处理、自定义异常、断言、日志记录
-│   │   │   └── exception_handling_demo.py
-│   │   └── 08-Standard-Library/  # 常用标准库：os, sys, datetime, random, math, itertools
-│   │       └── standard_library_demo.py
-│   ├── 1Learning/        # 学习资料
-│   └── Test/             # 测试代码
-│
-├── Matlab/               # Matlab 相关代码
-│   ├── Robotics/         # 机器人仿真、控制算法验证
-│   ├── DataAnalysis/     # 数据分析、可视化
-│   └── RTB.mltbx         # Robotics Toolbox 工具箱
-│
-├── Common/               # 跨语言共享资源
-│   ├── Configs/          # 机器人配置文件、URDF
-│   ├── Datasets/         # 机械臂数据集
-│   └── Docs/             # 项目文档
-│
-├── Archive/              # 旧代码、实验归档
-├── zip/                  # 压缩包、安装包
-└── download.png          # 下载资源
-```
+
+## 使用建议
+
+- 想看基础学习内容时，优先从 `Py/Learning/` 和 `C++/Learning/` 开始
+- 想看课程实践与模型实现时，可直接进入 `Py/Projects/DeepLearning/`
+- 想找历史实验或旧项目，可在 `Archive/` 中查找
+- 公共配置、文档和数据集统一放在 `Common/` 下，方便跨项目复用
 
 ## 环境要求
 
-- C++: ROS, CMake, C++17+
-- Python: 3.8+
-- Matlab: R2020b+
+- C++：`CMake`、`C++17+`、部分项目依赖 `ROS`
+- Python：建议 `Python 3.8+`
+- Matlab：建议 `R2020b+`
