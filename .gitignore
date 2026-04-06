@@ -41,3 +41,5 @@ config.local.yaml
 *.pkl
 *.npy
 *.mat
+Archive/LLaVA/
+Archive/visualize_dataset/
