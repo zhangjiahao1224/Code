@@ -9,6 +9,7 @@
 - `Class_3.py`：小型 CNN 目标检测器，包含分类头、边框回归头与实时推理。
 - `Class_4.py`：卷积自编码器与表示学习，包含重建、线性探针、PCA 与 t-SNE 可视化。
 - `Class_5.py`：深度强化学习，包含离散动作的 DQN 与连续动作的策略梯度示例。
+- `Class_6.py`：深度学习的局限性与新前沿，包含记忆化实验和对抗样本鲁棒性实验。
 - `artifacts/`：运行脚本后生成的模型权重、重建图、可视化结果等产物。
 
 ---
@@ -231,6 +232,95 @@
 
 ---
 
+## 第 6 课：Deep Learning Limitations and New Frontiers
+
+`Class_6.py` 对应 MIT 6.S191 第 6 课里一个很重要但经常被忽略的角度：我们不再只问“模型为什么强”，而是开始问“模型会在哪些地方失真、脆弱或者只是看起来学会了”。这份脚本把 Lecture 6 里最适合做成最小实验的两个主题拆出来：记忆化，以及对抗脆弱性。
+
+### 这一课在讲什么
+
+到了这一步，重点已经不只是继续堆模型能力，而是理解深度学习系统的边界：
+
+- 高容量网络未必真的学到了可泛化规律，它也可能只是把训练样本记住。
+- 在人眼看来几乎不变的输入扰动，可能就足以让模型预测翻转。
+- 为了让模型更可靠，我们需要把“泛化、鲁棒性、失败模式分析”也纳入实验闭环。
+
+这也是为什么第 6 课会从“能力展示”转向“能力边界和缓解手段”。
+
+### 你会看到什么
+
+- 实验 A：`two-moons` 2D 分类任务，对比真实标签训练与随机标签训练。
+- `PointMLP`：一个足够有容量的小型多层感知机，用来演示 memorization。
+- 决策边界可视化：直接把模型如何切分输入空间画出来。
+- 实验 B：小型合成图形分类任务上的 FGSM 对抗攻击。
+- `TinyConvNet`：普通 CNN 与最基础的 adversarial training 对比。
+- clean accuracy 和 FGSM accuracy 的分开曲线导出。
+- 对抗样本可视化：`clean / perturbation / adversarial` 三列对照。
+
+### 为什么这节课适合这样做
+
+Lecture 6 里有很多更大的话题，比如可靠性、分布外泛化、模型安全、LLM frontier 等，但如果全部塞进一份教学脚本，反而会分散重点。因此这份实现刻意抓住两个最容易“亲眼看见”的现象：
+
+#### 1. 记忆化
+
+实验 A 回答的是：“如果训练标签根本没有规律，神经网络还会学到什么？”
+
+- 当标签是真实结构时，模型既能在训练集上拟合，也能在测试集上泛化。
+- 当标签被随机打乱时，模型仍然可能把训练集学得很好。
+- 但因为随机标签本身没有可迁移规律，所以测试集表现会明显崩掉。
+
+这正是“高容量不等于高理解”的一个经典例子。
+
+#### 2. 对抗脆弱性
+
+实验 B 回答的是：“模型在标准精度很高时，是否真的足够稳健？”
+
+- 普通训练模型在干净样本上的精度很高。
+- 但加入一个很小的、沿梯度方向设计的扰动后，性能会显著下降。
+- 最基础的对抗训练会让模型在攻击样本上明显更稳。
+
+这对应的是深度学习系统在部署时经常会遇到的“看起来很准，但边界很脆”的问题。
+
+### 运行后会生成什么
+
+运行 `Class_6.py` 后，通常会在 `artifacts/Class_6/` 下生成：
+
+- `memorization_train_accuracy.png`：实验 A 中训练集精度对比图。
+- `memorization_accuracy_curves.png`：实验 A 中测试集精度对比图。
+- `decision_boundary_true_labels.png`：真实标签训练后的决策边界。
+- `decision_boundary_random_labels.png`：随机标签训练后的决策边界。
+- `memorization_report.txt`：记忆化实验报告。
+- `adversarial_clean_accuracy.png`：实验 B 中 clean accuracy 对比图。
+- `adversarial_accuracy_curves.png`：实验 B 中 FGSM accuracy 对比图。
+- `adversarial_showcase.png`：普通 CNN 的 clean / perturbation / adversarial 样本展示。
+- `shape_classifier_standard.pt`：普通训练 CNN 权重。
+- `shape_classifier_robust.pt`：对抗训练 CNN 权重。
+- `adversarial_report.txt`：对抗鲁棒性实验报告。
+
+### 如何读这些输出结果
+
+- `memorization_train_accuracy.png`：看随机标签模型是否真的把训练集越记越牢。
+- `memorization_accuracy_curves.png`：看随机标签模型为什么“训练很好但测试很差”。
+- `decision_boundary_true_labels.png`：看模型是否学到了平滑、贴合结构的边界。
+- `decision_boundary_random_labels.png`：看随机标签训练后边界如何被切得支离破碎。
+- `adversarial_clean_accuracy.png`：看普通训练和对抗训练在干净样本上是否有明显精度代价。
+- `adversarial_accuracy_curves.png`：看对抗训练是否提升了 FGSM 下的鲁棒性。
+- `adversarial_showcase.png`：看那些对人眼不显著的扰动，为什么会让普通模型预测翻转。
+
+### 这一课的核心收获
+
+- 神经网络容量足够大时，确实可能出现“记忆训练集”而非“学习规律”的现象。
+- 高测试精度并不自动意味着模型鲁棒，特别是在输入被精心扰动时。
+- 对抗训练是一个很基础但直观有效的鲁棒性缓解手段。
+- synthetic 实验比真实世界任务更理想化，因此更适合拿来做“机制演示”，而不是直接外推到真实部署结论。
+
+### 如果继续往下学，下一步自然是什么
+
+- 从记忆化继续往后，可以学习 double descent、label noise、implicit bias、calibration。
+- 从对抗样本继续往后，可以学习 PGD、certified robustness、OOD detection、distribution shift。
+- 如果你更关心大模型与 frontier system，这一课还可以继续延伸到 LLM safety、hallucination、alignment 和 evaluation。
+
+---
+
 ## 建议的学习顺序
 
 1. 先看 `Class_1.py`，把训练循环、损失函数和优化器的基本逻辑吃透。
@@ -238,6 +328,7 @@
 3. 然后看 `Class_3.py`，把分类问题扩展到“分类 + 定位”的检测问题。
 4. 最后看 `Class_4.py`，理解无监督表示学习如何在没有显式标签的情况下提取有效特征。
 5. 再看 `Class_5.py`，把深度学习从“静态数据学习”推进到“在环境中交互并最大化长期回报”的序列决策问题。
+6. 最后看 `Class_6.py`，把注意力从“模型能做什么”进一步扩展到“模型会在哪里失效，以及我们如何分析和缓解这些失效”。 
 
 ---
 

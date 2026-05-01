@@ -7,6 +7,16 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
 
+BASE_DIR = Path(__file__).resolve().parent
+ARTIFACTS_DIR = BASE_DIR / "artifacts" / "Class_3"
+
+
+def artifact_path(filename: str) -> str:
+    """返回位于当前脚本目录下 artifacts 文件夹中的绝对路径。"""
+
+    return str(ARTIFACTS_DIR / filename)
+
+
 # -----------------------------
 # 基础工具
 # -----------------------------
@@ -256,7 +266,7 @@ def train_detector(
 # -----------------------------
 def save_detector_checkpoint(
     model: nn.Module,
-    path: str = "artifacts/tiny_detector.pt",
+    path: str = artifact_path("tiny_detector.pt"),
     class_names: tuple[str, ...] = ("square", "h_rect", "v_rect"),
     input_size: int = 32,
 ) -> str:
@@ -370,7 +380,7 @@ def run_realtime_detection(
 def run_cnn_realtime_pipeline(device: torch.device) -> None:
     """如有权重则直接加载，否则先训练，然后进行实时检测。"""
 
-    ckpt_path = "artifacts/tiny_detector.pt"
+    ckpt_path = artifact_path("tiny_detector.pt")
     class_names = ("square", "h_rect", "v_rect")
 
     if Path(ckpt_path).exists():

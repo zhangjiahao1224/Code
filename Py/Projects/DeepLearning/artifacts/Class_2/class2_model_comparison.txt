@@ -1,0 +1,44 @@
+Class 2 序列模型对比报告
+========================================
+
+整体结果：
+- RNN: 参数量=8074, 训练时间=7.56s, 平均每轮耗时=0.126s, 最终训练损失=0.0685, 最终验证损失=0.0710, 最佳验证损失=0.0709
+- LSTM: 参数量=25354, 训练时间=5.30s, 平均每轮耗时=0.088s, 最终训练损失=0.0671, 最终验证损失=0.0690, 最佳验证损失=0.0689
+- GRU: 参数量=19594, 训练时间=4.34s, 平均每轮耗时=0.072s, 最终训练损失=0.0663, 最终验证损失=0.0688, 最佳验证损失=0.0685
+- Transformer: 参数量=24474, 训练时间=11.71s, 平均每轮耗时=0.195s, 最终训练损失=0.0756, 最终验证损失=0.0744, 最佳验证损失=0.0717
+
+门控模型与注意力模型对比：
+- LSTM 最佳验证损失：0.0689
+- GRU 最佳验证损失：0.0685
+- Transformer 最佳验证损失：0.0717
+- LSTM 训练时间：5.30s
+- GRU 训练时间：4.34s
+- Transformer 训练时间：11.71s
+
+长依赖测试摘要：
+Transformer 结构：
+- 层数：2
+- 头数：4
+
+Transformer 多头数对比：
+- heads=1: 参数量=24474, 最佳验证损失=0.0791, 训练时间=5.65s
+- heads=2: 参数量=24474, 最佳验证损失=0.0807, 训练时间=4.63s
+- heads=4: 参数量=24474, 最佳验证损失=0.0805, 训练时间=4.33s
+
+长依赖测试摘要：
+- 短依赖测试:
+  RNN: the clouds are in the sky. i grew 
+  LSTM: the clouds are in the sky. i grew 
+  GRU: the clouds are in the sky. i grew 
+  Transformer: the clouds are in the sky. i grew 
+- 长依赖测试:
+  RNN: i grew up in france and now i speak fluent french. sequ
+  LSTM: i grew up in france and now i speak fluent french. sequ
+  GRU: i grew up in france and now i speak fluent french. sequ
+  Transformer: i grew up in france and now i speak fluent french. sequ
+
+Checkpoint：
+- RNN: D:\Code\Py\Projects\DeepLearning\artifacts\Class_2\class2_rnn_checkpoint.pt
+- LSTM: D:\Code\Py\Projects\DeepLearning\artifacts\Class_2\class2_lstm_checkpoint.pt
+- GRU: D:\Code\Py\Projects\DeepLearning\artifacts\Class_2\class2_gru_checkpoint.pt
+- Transformer: D:\Code\Py\Projects\DeepLearning\artifacts\Class_2\class2_transformer_checkpoint.pt

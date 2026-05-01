@@ -9,6 +9,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+BASE_DIR = Path(__file__).resolve().parent
+ARTIFACTS_DIR = BASE_DIR / "artifacts" / "Class_5"
+
+
+def artifact_path(filename: str) -> str:
+    """返回位于当前脚本目录下 artifacts 文件夹中的绝对路径。"""
+
+    return str(ARTIFACTS_DIR / filename)
+
+
 # ------------------------------------------------------------
 # 第 5 课：深度强化学习
 #
@@ -442,7 +452,7 @@ def save_dqn_policy_report(model: nn.Module, env: LineWorldEnv, device: torch.de
                 f"Q={q_values.tolist()}"
             )
 
-    return save_text_report("\n".join(lines), "artifacts/dqn_policy_report.txt")
+    return save_text_report("\n".join(lines), artifact_path("dqn_policy_report.txt"))
 
 
 def save_dqn_rollout_report(model: nn.Module, env: LineWorldEnv, device: torch.device) -> str:
@@ -470,10 +480,10 @@ def save_dqn_rollout_report(model: nn.Module, env: LineWorldEnv, device: torch.d
 
     lines.append("")
     lines.append(f"结束={done} | 是否成功={bool(info.get('success', False))} | 总回报={total_reward:.2f}")
-    return save_text_report("\n".join(lines), "artifacts/dqn_rollout.txt")
+    return save_text_report("\n".join(lines), artifact_path("dqn_rollout.txt"))
 
 
-def save_dqn_checkpoint(model: nn.Module, env: LineWorldEnv, path: str = "artifacts/dqn_lineworld.pt") -> str:
+def save_dqn_checkpoint(model: nn.Module, env: LineWorldEnv, path: str = artifact_path("dqn_lineworld.pt")) -> str:
     """保存 DQN checkpoint。"""
 
     ckpt = {
@@ -731,7 +741,7 @@ def save_policy_rollout_report(policy: nn.Module, env: ContinuousDriveEnv, devic
 
     lines.append("")
     lines.append(f"是否成功={bool(info.get('success', False))} | 总回报={total_reward:+.3f}")
-    report_path = save_text_report("\n".join(lines), "artifacts/policy_gradient_rollout.txt")
+    report_path = save_text_report("\n".join(lines), artifact_path("policy_gradient_rollout.txt"))
     return report_path, positions
 
 
@@ -755,13 +765,13 @@ def save_policy_report(policy: nn.Module, device: torch.device) -> str:
                 f"状态={state_tuple} | 动作均值={float(mean.item()):+.3f} | 标准差={float(std.item()):.3f}"
             )
 
-    return save_text_report("\n".join(lines), "artifacts/policy_gradient_report.txt")
+    return save_text_report("\n".join(lines), artifact_path("policy_gradient_report.txt"))
 
 
 def save_policy_checkpoint(
     policy: nn.Module,
     state_dim: int,
-    path: str = "artifacts/policy_gradient_drive.pt",
+    path: str = artifact_path("policy_gradient_drive.pt"),
 ) -> str:
     """保存策略梯度 checkpoint。"""
 
@@ -861,10 +871,10 @@ def run_dqn_lesson(device: torch.device, force_retrain: bool = False) -> None:
     print("第 5 课 A：离散动作环境上的 DQN")
 
     env = LineWorldEnv(num_states=9, max_steps=16)
-    ckpt_path = "artifacts/dqn_lineworld.pt"
-    return_curve_path = "artifacts/dqn_returns.png"
-    success_curve_path = "artifacts/dqn_success_rate.png"
-    history_report_path = "artifacts/dqn_training_history.txt"
+    ckpt_path = artifact_path("dqn_lineworld.pt")
+    return_curve_path = artifact_path("dqn_returns.png")
+    success_curve_path = artifact_path("dqn_success_rate.png")
+    history_report_path = artifact_path("dqn_training_history.txt")
 
     if Path(ckpt_path).exists() and not force_retrain:
         print(f"检测到已有 DQN 权重，直接加载：{ckpt_path}")
@@ -921,10 +931,10 @@ def run_policy_gradient_lesson(device: torch.device, force_retrain: bool = False
     # 进而把策略梯度带到一条明显更差的训练轨迹上。
     policy_seed = 42
     env = ContinuousDriveEnv(max_steps=35)
-    ckpt_path = "artifacts/policy_gradient_drive.pt"
-    return_curve_path = "artifacts/policy_gradient_returns.png"
-    success_curve_path = "artifacts/policy_gradient_success_rate.png"
-    history_report_path = "artifacts/policy_gradient_training_history.txt"
+    ckpt_path = artifact_path("policy_gradient_drive.pt")
+    return_curve_path = artifact_path("policy_gradient_returns.png")
+    success_curve_path = artifact_path("policy_gradient_success_rate.png")
+    history_report_path = artifact_path("policy_gradient_training_history.txt")
     # 如果已保存的权重明显过差，就不盲目复用，而是自动重训。
     min_success_rate = 0.80
 
@@ -1001,7 +1011,7 @@ def run_policy_gradient_lesson(device: torch.device, force_retrain: bool = False
     rollout_report, positions = save_policy_rollout_report(policy, env, device)
     rollout_curve = save_curve_plot(
         positions,
-        path="artifacts/policy_gradient_position_curve.png",
+        path=artifact_path("policy_gradient_position_curve.png"),
         title="策略 rollout 位置变化曲线",
         y_label="position",
     )

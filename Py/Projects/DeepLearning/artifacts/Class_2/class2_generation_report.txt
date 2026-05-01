@@ -1,0 +1,28 @@
+Class 2 生成文本报告
+========================================
+
+RNN 生成示例：
+sequence modeling uses context to predict the next symbol. rnn keeps a hidden state over 
+
+LSTM 生成示例：
+sequence modeling uses context to predict the next symbol. rnn keeps a hidden the next sy
+
+GRU 生成示例：
+sequence modeling uses context to predict the next symbol. rnn keeps a hidden state over 
+
+Transformer 生成示例：
+sequence modeling uses context to predict the next symbol. rnn keeps hidden state over ti
+
+长依赖测试：
+
+短依赖测试：
+- RNN: the clouds are in the sky. i grew 
+- LSTM: the clouds are in the sky. i grew 
+- GRU: the clouds are in the sky. i grew 
+- Transformer: the clouds are in the sky. i grew 
+
+长依赖测试：
+- RNN: i grew up in france and now i speak fluent french. sequ
+- LSTM: i grew up in france and now i speak fluent french. sequ
+- GRU: i grew up in france and now i speak fluent french. sequ
+- Transformer: i grew up in france and now i speak fluent french. sequ

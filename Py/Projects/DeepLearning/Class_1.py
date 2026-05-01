@@ -5,6 +5,16 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
 
+BASE_DIR = Path(__file__).resolve().parent
+ARTIFACTS_DIR = BASE_DIR / "artifacts" / "Class_1"
+
+
+def artifact_path(filename: str) -> str:
+    """返回位于当前脚本目录下 artifacts 文件夹中的绝对路径。"""
+
+    return str(ARTIFACTS_DIR / filename)
+
+
 # 本文件演示一个完整的小型深度学习训练流程：
 # 1. 构造合成二分类数据集。
 # 2. 使用 MLP 模型进行二分类预测。
@@ -101,7 +111,7 @@ def extract_model_config(model):
     }
 
 
-def save_checkpoint(model, history, checkpoint_path="artifacts/best_mlp_checkpoint.pt"):
+def save_checkpoint(model, history, checkpoint_path=artifact_path("best_mlp_checkpoint.pt")):
     """保存模型权重、结构配置和训练历史。
 
     checkpoint 是一个字典，包含恢复模型和分析训练过程所需的信息。
@@ -151,7 +161,7 @@ def load_checkpoint(checkpoint_path, device=None):
     return model, checkpoint.get("history")
 
 
-def plot_history(history, save_path="artifacts/training_curves.png"):
+def plot_history(history, save_path=artifact_path("training_curves.png")):
     """使用 Pillow 绘制并保存训练/验证曲线。
 
     为了避免额外依赖 matplotlib，这里直接用 Pillow 画简单折线图。

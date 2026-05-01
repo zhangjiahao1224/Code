@@ -585,7 +585,13 @@ def evaluate_vae(
         for xb, _ in loader:
             xb = xb.to(device)
             recon, _, mu, logvar = model(xb)
-            loss, recon_mse, kl_per_sample = vae_loss(recon, xb, mu, logvar, beta=beta)
+            loss, recon_mse, kl_per_sample = vae_loss(
+                recon,
+                xb,
+                mu,
+                logvar,
+                beta=beta,
+            )
             total_loss += loss.item()
             total_recon += recon_mse.item()
             total_kl += kl_per_sample.item()
@@ -598,6 +604,21 @@ def evaluate_vae(
     )
 
 
+def linear_beta_schedule(
+    epoch: int,
+    total_epochs: int,
+    target_beta: float,
+    warmup_ratio: float = 0.4,
+) -> float:
+    """Linearly warm beta from 0 to target_beta during early epochs."""
+
+    warmup_epochs = max(1, int(total_epochs * warmup_ratio))
+    if warmup_epochs == 1:
+        return target_beta
+    progress = min(epoch - 1, warmup_epochs - 1) / (warmup_epochs - 1)
+    return float(target_beta * progress)
+
+
 def train_vae(
     model: nn.Module,
     train_loader: DataLoader,
@@ -606,6 +627,7 @@ def train_vae(
     lr: float,
     device: torch.device,
     beta: float = 1.0,
+    beta_warmup_ratio: float = 0.4,
 ) -> tuple[float, float]:
     """训练 VAE，并返回最佳验证集总损失与逐像素 MSE。"""
 
@@ -620,11 +642,23 @@ def train_vae(
         total_recon = 0.0
         total_kl = 0.0
         total_batches = 0
+        current_beta = linear_beta_schedule(
+            epoch=epoch,
+            total_epochs=epochs,
+            target_beta=beta,
+            warmup_ratio=beta_warmup_ratio,
+        )
 
         for xb, _ in train_loader:
             xb = xb.to(device)
             recon, _, mu, logvar = model(xb)
-            loss, recon_mse, kl_per_sample = vae_loss(recon, xb, mu, logvar, beta=beta)
+            loss, recon_mse, kl_per_sample = vae_loss(
+                recon,
+                xb,
+                mu,
+                logvar,
+                beta=current_beta,
+            )
 
             optimizer.zero_grad()
             loss.backward()
@@ -646,7 +680,7 @@ def train_vae(
         if epoch == 1 or epoch % 5 == 0 or epoch == epochs:
             print(
                 f"[VAE] 第 {epoch:02d} 轮 | "
-                f"训练总损失={train_loss:.4f} | 训练重建MSE={train_recon:.6f} | "
+                f"beta={current_beta:.3f} | 训练总损失={train_loss:.4f} | 训练重建MSE={train_recon:.6f} | "
                 f"训练KL={train_kl:.4f} | 验证重建MSE={val_recon:.6f} | 验证KL={val_kl:.4f}"
             )
 
@@ -655,7 +689,7 @@ def train_vae(
 
 def save_vae_checkpoint(
     model: nn.Module,
-    path: str = "artifacts/vae_shapes.pt",
+    path: str = "artifacts/vae_shapes_beta_anneal.pt",
 ) -> str:
     """保存 VAE 权重。"""
 
@@ -663,6 +697,7 @@ def save_vae_checkpoint(
         "state_dict": model.state_dict(),
         "image_size": model.image_size,
         "latent_dim": model.latent_dim,
+        "training_variant": "beta_annealing",
     }
     file = Path(path)
     file.parent.mkdir(parents=True, exist_ok=True)
@@ -818,6 +853,32 @@ class MLPDiscriminator(nn.Module):
         return self.net(x)
 
 
+def compute_gradient_penalty(
+    critic: nn.Module,
+    real_images: torch.Tensor,
+    fake_images: torch.Tensor,
+    device: torch.device,
+) -> torch.Tensor:
+    """Gradient penalty used by WGAN-GP."""
+
+    batch_size = real_images.size(0)
+    alpha = torch.rand(batch_size, 1, 1, 1, device=device)
+    interpolated = alpha * real_images + (1.0 - alpha) * fake_images
+    interpolated.requires_grad_(True)
+    critic_scores = critic(interpolated)
+    grad_outputs = torch.ones_like(critic_scores, device=device)
+    gradients = torch.autograd.grad(
+        outputs=critic_scores,
+        inputs=interpolated,
+        grad_outputs=grad_outputs,
+        create_graph=True,
+        retain_graph=True,
+        only_inputs=True,
+    )[0]
+    gradients = gradients.view(batch_size, -1)
+    return ((gradients.norm(2, dim=1) - 1.0) ** 2).mean()
+
+
 def train_gan(
     generator: nn.Module,
     discriminator: nn.Module,
@@ -826,6 +887,8 @@ def train_gan(
     lr: float,
     device: torch.device,
     noise_dim: int = 32,
+    critic_steps: int = 5,
+    lambda_gp: float = 10.0,
 ) -> tuple[float, float]:
     """
     训练最简 GAN。
@@ -836,9 +899,8 @@ def train_gan(
 
     generator.to(device)
     discriminator.to(device)
-    opt_g = torch.optim.Adam(generator.parameters(), lr=lr, betas=(0.5, 0.999))
-    opt_d = torch.optim.Adam(discriminator.parameters(), lr=lr, betas=(0.5, 0.999))
-    loss_fn = nn.BCEWithLogitsLoss()
+    opt_g = torch.optim.Adam(generator.parameters(), lr=lr, betas=(0.0, 0.9))
+    opt_d = torch.optim.Adam(discriminator.parameters(), lr=lr, betas=(0.0, 0.9))
     last_d_loss = 0.0
     last_g_loss = 0.0
 
@@ -847,33 +909,31 @@ def train_gan(
         discriminator.train()
         running_d = 0.0
         running_g = 0.0
+        running_wdist = 0.0
         total_batches = 0
 
         for (xb,) in loader:
             xb = xb.to(device)
             bs = xb.size(0)
 
-            real_targets = torch.ones(bs, 1, device=device)
-            fake_targets = torch.zeros(bs, 1, device=device)
+            for _ in range(critic_steps):
+                z = torch.randn(bs, noise_dim, device=device)
+                fake_images = generator(z).detach()
+                real_scores = discriminator(xb)
+                fake_scores = discriminator(fake_images)
+                wasserstein_distance = real_scores.mean() - fake_scores.mean()
+                gp = compute_gradient_penalty(discriminator, xb, fake_images, device=device)
+                d_loss = -wasserstein_distance + lambda_gp * gp
 
-            # 先训练判别器：提高“分真假”的能力。
-            z = torch.randn(bs, noise_dim, device=device)
-            fake_images = generator(z).detach()
-            real_logits = discriminator(xb)
-            fake_logits = discriminator(fake_images)
-            d_loss_real = loss_fn(real_logits, real_targets)
-            d_loss_fake = loss_fn(fake_logits, fake_targets)
-            d_loss = 0.5 * (d_loss_real + d_loss_fake)
+                opt_d.zero_grad()
+                d_loss.backward()
+                opt_d.step()
 
-            opt_d.zero_grad()
-            d_loss.backward()
-            opt_d.step()
-
-            # 再训练生成器：让判别器把假图也当成真图。
+            # 再训练生成器：让判别器把假图也当成更高分。
             z = torch.randn(bs, noise_dim, device=device)
             fake_images = generator(z)
-            fake_logits = discriminator(fake_images)
-            g_loss = loss_fn(fake_logits, real_targets)
+            fake_scores = discriminator(fake_images)
+            g_loss = -fake_scores.mean()
 
             opt_g.zero_grad()
             g_loss.backward()
@@ -881,14 +941,16 @@ def train_gan(
 
             running_d += d_loss.item()
             running_g += g_loss.item()
+            running_wdist += wasserstein_distance.item()
             total_batches += 1
 
         last_d_loss = running_d / total_batches
         last_g_loss = running_g / total_batches
+        avg_wdist = running_wdist / total_batches
         if epoch == 1 or epoch % 10 == 0 or epoch == epochs:
             print(
                 f"[GAN] 第 {epoch:03d} 轮 | "
-                f"判别器损失={last_d_loss:.4f} | 生成器损失={last_g_loss:.4f}"
+                f"W-distance={avg_wdist:.4f} | Critic loss={last_d_loss:.4f} | Generator loss={last_g_loss:.4f}"
             )
 
     return last_d_loss, last_g_loss
@@ -897,7 +959,7 @@ def train_gan(
 def save_gan_checkpoint(
     generator: nn.Module,
     discriminator: nn.Module,
-    path: str = "artifacts/gan_shapes.pt",
+    path: str = "artifacts/wgan_gp_shapes.pt",
 ) -> str:
     """保存 GAN 的生成器和判别器权重。"""
 
@@ -906,6 +968,7 @@ def save_gan_checkpoint(
         "discriminator_state_dict": discriminator.state_dict(),
         "noise_dim": generator.noise_dim,
         "image_size": generator.image_size,
+        "training_variant": "wgan_gp",
     }
     file = Path(path)
     file.parent.mkdir(parents=True, exist_ok=True)
@@ -980,7 +1043,10 @@ def compute_tsne_2d(latents: torch.Tensor) -> torch.Tensor | None:
         perplexity=perplexity,
         random_state=42,
     )
-    points = tsne.fit_transform(latents_np)
+    try:
+        points = tsne.fit_transform(latents_np)
+    except OSError:
+        return None
     return torch.from_numpy(points).float()
 
 
@@ -1180,10 +1246,6 @@ def run_autoencoder_lesson(device: torch.device, force_retrain: bool = False) ->
     with torch.no_grad():
         full_recon_loss = evaluate_autoencoder(model, full_loader, device)
     print(f"全数据集逐像素 MSE：{full_recon_loss:.6f}")
-    print("结果解读：")
-    print("- 瓶颈层会强迫模型把每张图压缩成较短的潜在向量。")
-    print("- 重建损失会推动这个潜在向量尽量保留还原原图所需的信息。")
-    print("- 线性探针用于检查这个潜在表示是否也对下游图形分类有帮助。")
 
 
 def run_vae_lesson(device: torch.device, force_retrain: bool = False) -> None:
@@ -1201,7 +1263,8 @@ def run_vae_lesson(device: torch.device, force_retrain: bool = False) -> None:
     latent_dim = 8
     batch_size = 128
     beta = 1.0
-    ckpt_path = "artifacts/vae_shapes.pt"
+    beta_warmup_ratio = 0.4
+    ckpt_path = "artifacts/vae_shapes_beta_anneal.pt"
 
     images, labels = make_autoencoder_dataset(num_samples=3600, image_size=image_size)
     dataset = TensorDataset(images, labels)
@@ -1216,6 +1279,7 @@ def run_vae_lesson(device: torch.device, force_retrain: bool = False) -> None:
     print(f"- 图像尺寸：{image_size}x{image_size}")
     print(f"- 潜在向量维度：{latent_dim}")
     print(f"- beta 系数：{beta}")
+    print(f"- beta warmup：前 {max(1, int(25 * beta_warmup_ratio))} 轮线性退火")
 
     if Path(ckpt_path).exists() and not force_retrain:
         print(f"检测到已有 VAE 权重，直接加载：{ckpt_path}")
@@ -1232,6 +1296,7 @@ def run_vae_lesson(device: torch.device, force_retrain: bool = False) -> None:
             lr=1e-3,
             device=device,
             beta=beta,
+            beta_warmup_ratio=beta_warmup_ratio,
         )
         save_vae_checkpoint(model, ckpt_path)
         _, _, best_val_kl = evaluate_vae(model, val_loader, device, beta=beta)
@@ -1249,11 +1314,6 @@ def run_vae_lesson(device: torch.device, force_retrain: bool = False) -> None:
         print(f"VAE 随机采样图已保存到：{sample_path}")
     if traversal_path is not None:
         print(f"VAE latent traversal 图已保存到：{traversal_path}")
-    print("结果解读：")
-    print("- 普通自编码器学习的是一个确定性的 z。")
-    print("- VAE 学习的是 q(z|x) 的分布参数，因此 latent space 更适合采样。")
-    print("- 重参数化技巧让采样层仍然可以参与反向传播。")
-    print("- KL 项会把后验分布往标准正态先验拉近，从而让生成更平滑。")
 
 
 def run_gan_lesson(device: torch.device, force_retrain: bool = False) -> None:
@@ -1269,7 +1329,9 @@ def run_gan_lesson(device: torch.device, force_retrain: bool = False) -> None:
     image_size = 16
     noise_dim = 32
     batch_size = 128
-    ckpt_path = "artifacts/gan_shapes.pt"
+    critic_steps = 5
+    lambda_gp = 10.0
+    ckpt_path = "artifacts/wgan_gp_shapes.pt"
 
     images, _ = make_autoencoder_dataset(num_samples=3600, image_size=image_size)
     dataset = TensorDataset(images)
@@ -1279,6 +1341,7 @@ def run_gan_lesson(device: torch.device, force_retrain: bool = False) -> None:
     print("GAN 对抗生成实验")
     print(f"- 图像尺寸：{image_size}x{image_size}")
     print(f"- 噪声向量维度：{noise_dim}")
+    print(f"- 训练框架：WGAN-GP (critic_steps={critic_steps}, lambda_gp={lambda_gp})")
 
     if Path(ckpt_path).exists() and not force_retrain:
         print(f"检测到已有 GAN 权重，直接加载：{ckpt_path}")
@@ -1300,6 +1363,8 @@ def run_gan_lesson(device: torch.device, force_retrain: bool = False) -> None:
             lr=2e-4,
             device=device,
             noise_dim=noise_dim,
+            critic_steps=critic_steps,
+            lambda_gp=lambda_gp,
         )
         save_gan_checkpoint(generator, discriminator, ckpt_path)
 
@@ -1309,11 +1374,6 @@ def run_gan_lesson(device: torch.device, force_retrain: bool = False) -> None:
     if last_d_loss == last_d_loss and last_g_loss == last_g_loss:
         print(f"GAN 最后一轮判别器损失：{last_d_loss:.4f}")
         print(f"GAN 最后一轮生成器损失：{last_g_loss:.4f}")
-    print("结果解读：")
-    print("- Generator 从简单噪声 z 出发，学习生成像真的图像。")
-    print("- Discriminator 接收真实图和生成图，学习区分真假。")
-    print("- 当两个网络对抗训练时，生成器会逐渐学会更逼真的分布映射。")
-    print("- GAN 不依赖显式重建损失，而是依赖“造假 vs 打假”的博弈。")
 
 
 def main() -> None:
