@@ -1,8 +1,8 @@
-# 机器人与 AI 代码仓库
+# Code — 机器人与 AI 代码仓库
 
 这个仓库用于整理机器人、机器学习、深度学习、计算机视觉，以及通用编程练习相关的代码与资料。内容既包含学习阶段的示例和实验，也包含课程实践、小项目、工具脚本，以及运行后生成的数据与产物。
 
-目前仓库以 `Python / C++ / Matlab` 三条主线组织，适合作为长期积累式的学习仓库来使用。
+目前仓库以 `Python / C++ / Matlab` 三条主线组织，配套 Claude Code ECC Skills 辅助开发，适合作为长期积累式的学习仓库来使用。
 
 ## 仓库定位
 
@@ -19,6 +19,7 @@
 | `Py/` | Python 相关代码，包含学习、项目、脚本、ROS、工具、刷题与数据分析 |
 | `C++/` | C++ 学习、算法、ROS、项目与工具库 |
 | `Matlab/` | Matlab 机器人仿真、轨迹与数据分析相关代码 |
+| `.claude/` | Claude Code 配置、Skill 使用指南与项目记忆 |
 | `Common/` | 共享资源、配置或通用内容 |
 | `data/` | 当前使用中的数据资源 |
 | `artifacts/` | 训练结果、导出图像、模型权重等运行产物 |
@@ -27,14 +28,17 @@
 
 ### Python 重点入口
 
-- [`Py/Projects/DeepLearning/`](./Py/Projects/DeepLearning/)：一组按课程推进的深度学习实践脚本，覆盖 MLP、序列建模、目标检测、生成模型与强化学习
+- [`.claude/SKILL_GUIDE.md`](./.claude/SKILL_GUIDE.md)：Claude Code ECC Skills 完整使用指南
+- [`Py/Projects/DeepLearning/`](./Py/Projects/DeepLearning/)：一组按课程推进的深度学习实践脚本，覆盖 MLP、序列建模、目标检测、生成模型、强化学习与 Transformer
 - [`Py/Projects/DeepLearning/README.md`](./Py/Projects/DeepLearning/README.md)：DeepLearning 课程实践总览
-- [`Py/Projects/DeepLearning/Class_5.py`](./Py/Projects/DeepLearning/Class_5.py)：第 5 课强化学习示例，包含 DQN 与 Policy Gradient
+- [`Py/Projects/DeepLearning/Class_1.py`](./Py/Projects/DeepLearning/Class_1.py)：第 1 课 MLP 与监督学习训练流程
+- [`Py/Projects/DeepLearning/Class_5.py`](./Py/Projects/DeepLearning/Class_5.py)：第 5 课强化学习，包含 DQN 与 Policy Gradient
+- [`Py/Projects/DeepLearning/Class_9.py`](./Py/Projects/DeepLearning/Class_9.py)：第 9 课从零拆解 Transformer Encoder
 - [`Py/Projects/pytorch/`](./Py/Projects/pytorch/)：PyTorch 入门练习、MNIST/CIFAR10 训练与 YOLO 实验
 - [`Py/Projects/MachineLearning/`](./Py/Projects/MachineLearning/)：机器学习课程资料与网页资源
 - [`Py/Projects/snake_bot/`](./Py/Projects/snake_bot/)：基于屏幕识别与路径规划的贪吃蛇机器人
 - [`Py/Learning/`](./Py/Learning/)：Python 基础与练习代码
-- [`Py/LeetCode/`](./Py/LeetCode/)：算法刷题记录 
+- [`Py/LeetCode/`](./Py/LeetCode/)：算法刷题记录
 - [`Py/Scripts/`](./Py/Scripts/)：课程脚本、Notebook 与辅助实验材料
 - [`Py/Utils/`](./Py/Utils/)：Python 通用工具函数
 
@@ -55,17 +59,21 @@
 
 如果你是从根目录开始看，下面几个入口最能代表目前仓库的主要实践方向：
 
-1. [`Py/Projects/DeepLearning/README.md`](./Py/Projects/DeepLearning/README.md)
-2. [`Py/Projects/DeepLearning/Class_1.py`](./Py/Projects/DeepLearning/Class_1.py)
-3. [`Py/Projects/DeepLearning/Class_4.py`](./Py/Projects/DeepLearning/Class_4.py)
-4. [`Py/Projects/DeepLearning/Class_5.py`](./Py/Projects/DeepLearning/Class_5.py)
-5. [`Py/Projects/pytorch/`](./Py/Projects/pytorch/)
+1. [`.claude/SKILL_GUIDE.md`](./.claude/SKILL_GUIDE.md) — Claude Code ECC Skills 完整使用指南
+2. [`Py/Projects/DeepLearning/README.md`](./Py/Projects/DeepLearning/README.md) — 深度学习课程总览
+3. [`Py/Projects/DeepLearning/Class_1.py`](./Py/Projects/DeepLearning/Class_1.py) — 入门训练闭环
+4. [`Py/Projects/DeepLearning/Class_4.py`](./Py/Projects/DeepLearning/Class_4.py) — Autoencoder / VAE / GAN
+5. [`Py/Projects/DeepLearning/Class_5.py`](./Py/Projects/DeepLearning/Class_5.py) — DQN 与策略梯度
+6. [`Py/Projects/DeepLearning/Class_6.py`](./Py/Projects/DeepLearning/Class_6.py) — 深度学习边界与鲁棒性
+7. [`Py/Projects/DeepLearning/Class_9.py`](./Py/Projects/DeepLearning/Class_9.py) — 从零拆解 Transformer
 
 其中：
 
 - `Class_1.py` 适合理解监督学习训练闭环
 - `Class_4.py` 适合理解 Autoencoder / VAE / GAN
 - `Class_5.py` 适合理解强化学习中的 DQN 与策略梯度
+- `Class_6.py` 适合理解记忆化、对抗脆弱性与模型鲁棒性
+- `Class_9.py` 适合理解 Transformer 的注意力机制、多头注意力和 Encoder-Decoder 结构
 
 ## 建议的阅读顺序
 
@@ -78,7 +86,7 @@
 ### 如果你想直接看深度学习实践
 
 1. 从 [`Py/Projects/DeepLearning/README.md`](./Py/Projects/DeepLearning/README.md) 开始
-2. 按课程顺序阅读 `Class_1.py` 到 `Class_5.py`
+2. 按课程顺序阅读 `Class_1.py` → `Class_2.py` → `Class_3.py` → `Class_4.py` → `Class_5.py` → `Class_6.py` → `Class_9.py`
 3. 再结合 `Py/Projects/DeepLearning/artifacts/` 中的结果文件理解训练输出
 
 ### 如果你想找历史资料或旧实验
@@ -91,6 +99,8 @@
 
 ```text
 .
+├── .claude/              # Claude Code 配置与 Skill 指南
+│   └── SKILL_GUIDE.md    # ECC Skills 完整使用文档
 ├── C++/
 │   ├── Algorithm/
 │   ├── Learning/
@@ -104,6 +114,7 @@
 │   ├── LeRobot/
 │   ├── Libs/
 │   ├── Projects/
+│   │   └── DeepLearning/ # 深度学习课程实践 (Class_1 ~ Class_9)
 │   ├── ROS/
 │   ├── Scripts/
 │   ├── Test/
@@ -124,15 +135,30 @@
 - C++：建议 `C++17+`
 - Matlab：建议 `R2020b+`
 - 深度学习相关脚本建议使用独立虚拟环境，并按项目分别安装依赖
+- Claude Code 辅助开发：参考 [`.claude/SKILL_GUIDE.md`](./.claude/SKILL_GUIDE.md) 了解 ECC Skills 使用方法
 
 ## 使用说明
 
 - 仓库里部分目录会保存训练权重、图像输出、日志等实验产物
 - 一些数据集和模型文件体积较大，可能已经存在于仓库中，也可能由脚本首次运行时自动生成
 - 如果某个子目录下已有自己的 `README.md`，优先以子目录文档为准
+- 推荐使用 Claude Code ECC Skills 辅助代码审查、构建修复和项目管理
+
+## 深度学习课程进度
+
+| 课程 | 文件 | 主题 | artifacts |
+| ---- | ---- | ---- | --------- |
+| Class 1 | `Class_1.py` | MLP 与监督学习训练流程 | `artifacts/Class_1/` |
+| Class 2 | `Class_2.py` | 序列建模：RNN 到 Transformer | `artifacts/Class_2/` |
+| Class 3 | `Class_3.py` | CNN 目标检测基础 | `artifacts/Class_3/` |
+| Class 4 | `Class_4.py` | Autoencoder / VAE / GAN | `artifacts/Class_4/` |
+| Class 5 | `Class_5.py` | 深度强化学习 (DQN + PG) | `artifacts/Class_5/` |
+| Class 6 | `Class_6.py` | 深度学习边界与鲁棒性 | `artifacts/Class_6/` |
+| Class 9 | `Class_9.py` | 从零拆解 Transformer Encoder | `artifacts/Class_9/` |
 
 ## 备注
 
 - 根目录 `README.md` 负责提供仓库总览与导航
 - 更具体的实验说明请查看对应子项目文档
 - 当前深度学习课程实践的核心说明位于 [`Py/Projects/DeepLearning/README.md`](./Py/Projects/DeepLearning/README.md)
+- Claude Code ECC Skills 使用指南位于 [`.claude/SKILL_GUIDE.md`](./.claude/SKILL_GUIDE.md)
