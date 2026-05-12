@@ -1,0 +1,46 @@
+Class 9 Token Decode Demo
+
+说明：
+- 模型训练时看到的是 token_ids，也就是整数序列。
+- Vocabulary.decode(token_ids) 会把整数转回 <CLS>、<MARK> 和数字 token。
+- decode 不参与训练和反向传播，只用于报告、可视化和人工检查。
+
+sample 1
+token_ids     : [0, 3, 7, 10, 10, 3, 5, 11, 11, 1, 8]
+decoded_tokens: ['<CLS>', '1', '5', '8', '8', '1', '3', '9', '9', '<MARK>', '6']
+decoded_text  : <CLS> 1 5 8 8 1 3 9 9 <MARK> 6
+marker        : token_ids[9]=1 -> <MARK>
+answer        : token_ids[10]=8 -> 6
+label         : 6
+
+sample 2
+token_ids     : [0, 9, 11, 9, 5, 2, 11, 3, 1, 6, 3]
+decoded_tokens: ['<CLS>', '7', '9', '7', '3', '0', '9', '1', '<MARK>', '4', '1']
+decoded_text  : <CLS> 7 9 7 3 0 9 1 <MARK> 4 1
+marker        : token_ids[8]=1 -> <MARK>
+answer        : token_ids[9]=6 -> 4
+label         : 4
+
+sample 3
+token_ids     : [0, 2, 1, 7, 5, 8, 6, 7, 7, 8, 10]
+decoded_tokens: ['<CLS>', '0', '<MARK>', '5', '3', '6', '4', '5', '5', '6', '8']
+decoded_text  : <CLS> 0 <MARK> 5 3 6 4 5 5 6 8
+marker        : token_ids[2]=1 -> <MARK>
+answer        : token_ids[3]=7 -> 5
+label         : 5
+
+sample 4
+token_ids     : [0, 1, 3, 10, 10, 6, 6, 9, 4, 11, 6]
+decoded_tokens: ['<CLS>', '<MARK>', '1', '8', '8', '4', '4', '7', '2', '9', '4']
+decoded_text  : <CLS> <MARK> 1 8 8 4 4 7 2 9 4
+marker        : token_ids[1]=1 -> <MARK>
+answer        : token_ids[2]=3 -> 1
+label         : 1
+
+sample 5
+token_ids     : [0, 7, 7, 9, 8, 3, 8, 1, 10, 9, 3]
+decoded_tokens: ['<CLS>', '5', '5', '7', '6', '1', '6', '<MARK>', '8', '7', '1']
+decoded_text  : <CLS> 5 5 7 6 1 6 <MARK> 8 7 1
+marker        : token_ids[7]=1 -> <MARK>
+answer        : token_ids[8]=10 -> 8
+label         : 8

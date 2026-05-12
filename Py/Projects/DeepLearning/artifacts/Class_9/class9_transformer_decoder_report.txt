@@ -1,0 +1,39 @@
+第 9 课：Transformer Decoder 自回归生成实验报告
+
+一、Decoder 任务
+- 输入是 <CLS> 开头的递增数字序列。
+- 训练目标是 next-token prediction：每个位置预测下一个 token。
+- 第 0 个目标是随机起点，只凭 <CLS> 无法确定，因此训练和评估时不计入 loss/accuracy。
+- Decoder 使用 causal mask，因此当前位置不能关注右侧未来 token。
+
+二、模型结构
+- 参数量：103244
+- 最大序列长度：18
+- embedding 维度：64
+- Transformer Decoder 层数：3
+- attention heads：4
+
+三、训练结果
+- final_train_loss：0.1227
+- final_train_token_acc：1.0000
+- final_val_loss：0.0510
+- final_val_token_acc：1.0000
+- best_epoch：3
+- best_val_loss：0.0510
+- best_val_token_acc：1.0000
+
+四、样本预测
+input_ids      : [0, 10, 11, 2, 3, 4, 5, 6, 7, 8]
+input_text     : <CLS> 8 9 0 1 2 3 4 5 6
+target_text    : 8 9 0 1 2 3 4 5 6 7
+predicted_text : 3 9 0 1 2 3 4 5 6 7
+scored_target  : 9 0 1 2 3 4 5 6 7
+scored_pred    : 9 0 1 2 3 4 5 6 7
+
+五、Greedy 生成
+prompt_text    : <CLS> 3
+generated_text : <CLS> 3 4 5 6 7 8 9 0 1 2 3
+
+六、读图提示
+- causal attention heatmap 的右上角代表未来位置。
+- 右上角应接近 0，说明 Decoder 没有偷看未来 token。

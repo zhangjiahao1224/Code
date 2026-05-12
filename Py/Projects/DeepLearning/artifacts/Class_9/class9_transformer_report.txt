@@ -1,0 +1,59 @@
+第 9 课：Transformer Encoder 标记查找实验报告
+
+一、任务规则
+- 输入序列第 0 位是 <CLS>，用于展示标准 Transformer 输入格式。
+- 序列中有一个 <MARK>。
+- 标签是 <MARK> 后面一格的数字。
+- 分类头读取 <MARK> 位置的最终隐藏状态。
+- 因为 <MARK> 位置随机，模型必须通过注意力动态查找答案。
+
+二、模型结构
+- 参数量：102922
+- 最大序列长度：15
+- embedding 维度：64
+- Transformer 层数：3
+- attention heads：4
+- readout token id：1
+- readout mode：mark
+- use position embedding：True
+- 每层结构：LayerNorm -> MultiHeadSelfAttention -> Residual -> LayerNorm -> FFN -> Residual
+
+三、训练结果
+- final_train_loss：0.3622
+- final_train_acc：0.9771
+- final_val_loss：0.1043
+- final_val_acc：1.0000
+- best_epoch：6
+- best_val_loss：0.1043
+- best_val_acc：1.0000
+- stopped_early：True
+
+四、对比实验
+- mark-readout：best_val_acc=0.9750, best_val_loss=0.4251, params=102922
+- cls-readout：best_val_acc=0.2694, best_val_loss=1.8856, params=102922
+- no-position：best_val_acc=0.2444, best_val_loss=1.9306, params=101962
+- one-head：best_val_acc=1.0000, best_val_loss=0.2691, params=102922
+- one-layer：best_val_acc=0.6500, best_val_loss=1.4977, params=35978
+- offset-2：best_val_acc=0.9972, best_val_loss=0.2827, params=102922
+
+五、长序列压力测试
+- content_len：14
+- val_loss：0.9252
+- val_acc：0.7300
+- 这个测试会使用训练时较少出现或没有充分训练的位置 embedding，因此它更像是在观察长度外推风险。
+
+六、预测示例
+sample=1 | input=<CLS> 1 5 8 8 1 3 9 9 <MARK> 6 | marker=<MARK>@9 | answer_token=6@10 | label=6 | pred=6 | confidence=0.942
+sample=2 | input=<CLS> 7 9 7 3 0 9 1 <MARK> 4 1 | marker=<MARK>@8 | answer_token=4@9 | label=4 | pred=4 | confidence=0.916
+sample=3 | input=<CLS> 0 <MARK> 5 3 6 4 5 5 6 8 | marker=<MARK>@2 | answer_token=5@3 | label=5 | pred=5 | confidence=0.943
+sample=4 | input=<CLS> <MARK> 1 8 8 4 4 7 2 9 4 | marker=<MARK>@1 | answer_token=1@2 | label=1 | pred=1 | confidence=0.893
+sample=5 | input=<CLS> 5 5 7 6 1 6 <MARK> 8 7 1 | marker=<MARK>@7 | answer_token=8@8 | label=8 | pred=8 | confidence=0.742
+sample=6 | input=<CLS> 8 9 7 6 8 4 6 9 <MARK> 8 | marker=<MARK>@9 | answer_token=8@10 | label=8 | pred=8 | confidence=0.898
+sample=7 | input=<CLS> 0 9 <MARK> 2 0 8 1 9 6 7 | marker=<MARK>@3 | answer_token=2@4 | label=2 | pred=2 | confidence=0.922
+sample=8 | input=<CLS> 7 3 1 7 7 8 4 8 <MARK> 4 | marker=<MARK>@9 | answer_token=4@10 | label=4 | pred=4 | confidence=0.931
+
+七、读图提示
+- attention heatmap 的横轴是被关注 token，纵轴是发出 query 的 token。
+- 蓝色边框标出 <MARK> 所在列，绿色边框标出答案 token 所在列。
+- 如果 <MARK> 行明显关注答案位置，说明模型已经学会用查询 token 取回目标信息。
+- 分头 heatmap 可以观察不同 head 是否学到不同关注模式。

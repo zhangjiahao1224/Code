@@ -1,0 +1,36 @@
+第 9 课：完整 Transformer Encoder-Decoder 实验报告
+
+一、Seq2Seq 任务
+- Encoder 输入一串随机数字 source。
+- Decoder 从 <CLS> 开始，用 teacher forcing 预测同一串数字。
+- Decoder block 包含 masked self-attention、cross-attention 和 FFN。
+- cross-attention 的 query 来自 Decoder，key/value 来自 Encoder memory。
+
+二、模型结构
+- 参数量：254476
+- source 最大长度：6
+- target 最大长度：6
+- embedding 维度：64
+- Encoder/Decoder 层数：3
+- attention heads：4
+
+三、训练结果
+- final_train_loss：0.1644
+- final_train_token_acc：0.9992
+- final_val_loss：0.0413
+- final_val_token_acc：1.0000
+- best_epoch：3
+- best_val_loss：0.0413
+- best_val_token_acc：1.0000
+
+四、样本预测
+source_text        : 9 0 6 7 7 5
+decoder_input_text : <CLS> 9 0 6 7 7
+target_text        : 9 0 6 7 7 5
+teacher_pred_text  : 9 0 6 7 7 5
+greedy_output_text : 9 0 6 7 7 5
+
+五、读图提示
+- cross-attention heatmap 的横轴是 Encoder source token。
+- 纵轴是 Decoder 当前 token 位置。
+- 如果某一行在对应 source token 上权重大，说明 Decoder 正在从 Encoder memory 取数。

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(claude plugin *)",
+      "Bash(python -c ' *)",
+      "Bash(python)",
+      "Bash(python -c \"exec\\(__import__\\('base64'\\).b64decode\\('aW1wb3J0IG9zCgpCQVNFID0gb3MucGF0aC5kaXJuYW1lKG9zLnBhdGguYWJzcGF0aChfX2ZpbGVfXykpCkNPTlRFTlQgPSByJyIiIiIidGVzdCBvbmx5IiIiIiIiJwpwcmludCgiVEVTVCBPSyIp'\\)\\)\")"
+    ]
+  },
+  "env": {
+    "ECC_GATEGUARD": "off"
+  }
+}
